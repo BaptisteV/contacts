@@ -4,6 +4,16 @@ const fs = require("fs")
 
 app.use(express.json())
 
+const { Client } = require("pg")
+const pgClient = new Client({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'contacts',
+  password: 'admin',
+  port: 5432,
+})
+pgClient.connect();
+
 class Contact {
   constructor(firstName, lastName) {
     this.firstName = firstName
@@ -14,26 +24,25 @@ class Contact {
   }
 }
 
-const contacts = [];
-
-// TODO: retrieve from the database
-contacts.push(new Contact("James", "Hetfield"));
-contacts.push(new Contact("Kirk", "Hammet"));
-
 app.get('/', function (req, res) {
+  const contacts = []
+  pgClient.query('SELECT "firstName", "lastName" FROM contacts', (err, queryResults) => {
+    console.log(err, queryResults.rows)
 
-  let index = fs.readFileSync(`public/index.html`);
-  // TODO: Use a templating engine
-  formattedContacts = contacts.map(contact => contact.format())
-  index = index.toString().replace("%CONTACTS%", formattedContacts.toString())
+    queryResults.rows.forEach((queryResult) => {
+      contacts.push(new Contact(queryResult.firstName, queryResult.lastName))
+    });
+    const formattedContacts = contacts.map(contact => contact.format())
+    let index = fs.readFileSync(`public/index.html`);
+    // TODO: Use a templating engine
+    index = index.toString().replace("%CONTACTS%", formattedContacts.toString())
 
-  res.send(index)
+    res.send(index)
+  })
 })
 
 app.post('/contacts', (req, res) => {
-  console.log("body", req.body)
-  contacts.push(new Contact(req.body.firstName, req.body.lastName));
-  console.log(contacts)
+  //contacts.push(new Contact(req.body.firstName, req.body.lastName));
   res.sendStatus(200)
 })
 
