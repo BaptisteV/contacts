@@ -12,28 +12,9 @@
     <input type="text" id="lastName" placeholder="Nom"></input>
     <button id="newContact">Ajouter</button>
     <br />
-    %CONTACTS%
-
-    <script type="text/javascript">
-        const button = document.getElementById('newContact');
-        button.addEventListener('click', async _ => {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            try {
-                await fetch('/contacts', {
-                    method: 'post',
-                    headers: {
-                        "Accept": "application/json",
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ "firstName": firstName, "lastName": lastName })
-                });
-                document.location.reload(true);
-            } catch (err) {
-                console.error(`Error: ${err}`);
-            }
-        });
-    </script>
+    <ul id="contactList">
+    </ul>
+    <script src="app.js"></script>
 </body>
 
 </html>

@@ -4,7 +4,7 @@ const fs = require("fs")
 const path = require('path');
 
 app.use(express.json())
-app.use(express.static(path.join(__dirname, 'public', 'assets')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const { Client } = require("pg")
 const pgClient = new Client({
@@ -27,8 +27,11 @@ class Contact {
 }
 
 app.get('/', async (req, res) => {
-  const contacts = []
+  res.send(fs.readFileSync(`public/index.html`))
+})
 
+app.get('/contacts', async (req, res) => {
+  const contacts = []
   try {
     const queryResults = await pgClient.query('SELECT "firstName", "lastName" FROM contacts');
     queryResults.rows.forEach((queryResult) => {
@@ -37,12 +40,7 @@ app.get('/', async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-
-  const formattedContacts = contacts.map(contact => contact.format())
-  let index = fs.readFileSync(`public/index.html`);
-  // TODO: Use a templating engine
-  index = index.toString().replace("%CONTACTS%", formattedContacts.toString())
-  res.send(index)
+  res.json(contacts)
 })
 
 app.post('/contacts', async (req, res) => {
@@ -60,3 +58,4 @@ app.post('/contacts', async (req, res) => {
 app.listen(3000, function () {
   console.log('Example app listening on port 3000! http://localhost:3000/')
 })
+module.exports = app;

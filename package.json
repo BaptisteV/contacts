@@ -1,6 +1,6 @@
 {
-    "name": "hello-world",
-    "description": "Sample NodeJs web application",
+    "name": "contacts",
+    "description": "A list of names, stored in a PostgreSQL database",
     "version": "0.0.1",
     "private": true,
     "devDependencies": {
