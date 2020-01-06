@@ -7,20 +7,20 @@
 </head>
 
 <body class="">
-    <h4>Hello World</h4>
+    <h4>Mes Contacts</h4>
     <input type="text" id="firstName" placeholder="Prénom"></input>
     <input type="text" id="lastName" placeholder="Nom"></input>
+    <button id="newContact">Ajouter</button>
     <br />
     %CONTACTS%
-    <button id="newContact"></button>
 
-    <script>
+    <script type="text/javascript">
         const button = document.getElementById('newContact');
         button.addEventListener('click', async _ => {
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
             try {
-                const response = await fetch('/contacts', {
+                await fetch('/contacts', {
                     method: 'post',
                     headers: {
                         "Accept": "application/json",

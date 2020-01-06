@@ -1,8 +1,10 @@
 const express = require('express')
 const app = express()
 const fs = require("fs")
+const path = require('path');
 
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public', 'assets')));
 
 const { Client } = require("pg")
 const pgClient = new Client({
@@ -24,7 +26,7 @@ class Contact {
   }
 }
 
-app.get('/', async function (req, res) {
+app.get('/', async (req, res) => {
   const contacts = []
 
   try {
@@ -35,7 +37,7 @@ app.get('/', async function (req, res) {
   } catch (err) {
     console.log(err);
   }
-  
+
   const formattedContacts = contacts.map(contact => contact.format())
   let index = fs.readFileSync(`public/index.html`);
   // TODO: Use a templating engine
@@ -43,8 +45,15 @@ app.get('/', async function (req, res) {
   res.send(index)
 })
 
-app.post('/contacts', (req, res) => {
-  //contacts.push(new Contact(req.body.firstName, req.body.lastName));
+app.post('/contacts', async (req, res) => {
+  const insertContactSQL = 'INSERT INTO contacts("firstName", "lastName") VALUES($1, $2)'
+  try{
+    await pgClient.query(insertContactSQL, [req.body.firstName, req.body.lastName]);
+  } catch (err){
+    console.log(err)
+    res.sendStatus(500)
+    return;
+  }
   res.sendStatus(200)
 })
 
