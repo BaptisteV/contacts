@@ -5,8 +5,11 @@ Small web app to save and delete contacts
 ### Techs
 
 NodeJS with express
+
 PostgreSQL DB
+
 Vanilla JS
+
 
 ### Install
 
