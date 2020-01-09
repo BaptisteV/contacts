@@ -44,3 +44,9 @@ TABLESPACE pg_default;
 ALTER TABLE public.contacts
     OWNER to postgres;
 ~~~
+
+### Run 
+
+~~~
+node index.js
+~~~
