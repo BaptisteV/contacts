@@ -61,6 +61,22 @@ app.post("/contacts", async (req, res) => {
   res.sendStatus(200);
 });
 
+app.delete("/contact", async (req, res) => {
+  const deleteContactSQL =
+    'DELETE FROM contacts WHERE "firstName" = $1 AND "lastName" = $2';
+    try {
+      await pgClient.query(deleteContactSQL, [
+        req.body.firstName,
+        req.body.lastName
+      ]);
+    } catch (err) {
+      console.log(err);
+      res.sendStatus(500);
+      return;
+    }
+    res.sendStatus(200);
+});
+
 app.listen(3000, function() {
   console.log("Example app listening on port 3000! http://localhost:3000/");
 });

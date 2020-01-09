@@ -17,13 +17,35 @@ button.addEventListener("click", async _ => {
   }
 });
 
+function createDeleteButton(li, contact) {
+  const button = document.createElement("button");
+  button.appendChild(document.createTextNode("X"));
+  button.addEventListener("click", async _ => {
+    try {
+      await fetch("/contact", {
+        method: "delete",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(contact)
+      });
+      document.location.reload(true);
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
+  });
+  li.appendChild(button);
+}
+
 function populateContactList(contacts) {
   const contactList = document.getElementById("contactList");
   contacts.forEach(contact => {
     const li = document.createElement("li");
     li.appendChild(
-      document.createTextNode(contact.firstName + " " + contact.lastName)
+      document.createTextNode(contact.firstName + " " + contact.lastName + " ")
     );
+    createDeleteButton(li, contact);
     contactList.appendChild(li);
   });
 }
