@@ -10,11 +10,11 @@ Vanilla JS
 
 ### Install
 
-'''
+~~~
 npm install
-'''
+~~~
 
-'''
+~~~sql
 -- Database: contacts
 
 -- DROP DATABASE contacts;
@@ -40,4 +40,4 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.contacts
     OWNER to postgres;
-'''
+~~~
