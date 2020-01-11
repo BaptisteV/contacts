@@ -35,7 +35,7 @@ app.get("/contacts", async (req, res) => {
   const contacts = [];
   try {
     const queryResults = await pgClient.query(
-      'SELECT "firstName", "lastName", "price" FROM contacts'
+      'SELECT "firstName", "lastName", "price" FROM contacts ORDER BY "price" DESC'
     );
     queryResults.rows.forEach(queryResult => {
       contacts.push(
@@ -56,25 +56,25 @@ app.post("/contact", async (req, res) => {
   const insertContactSQL =
     'INSERT INTO contacts("firstName", "lastName", "price") VALUES($1, $2, $3)';
 
-  function sanitizeNewContact (body) {
+  function sanitizeNewContact(body) {
     let price = req.body.price;
     if (isNaN(price)) price = 0;
 
     let firstName = body.firstName;
-    if(firstName.length === 0) firstName = null;
-    
+    if (firstName.length === 0) firstName = null;
+
     let lastName = body.lastName;
-    if(lastName.length === 0) lastName = null;
-    
-    return {firstName: firstName, lastName: lastName, price: price}
-  } 
+    if (lastName.length === 0) lastName = null;
+
+    return { firstName: firstName, lastName: lastName, price: price };
+  }
 
   const newContact = sanitizeNewContact(req.body);
   try {
     await pgClient.query(insertContactSQL, [
       newContact.firstName,
       newContact.lastName,
-      newContact.price,
+      newContact.price
     ]);
   } catch (err) {
     console.log(err);
