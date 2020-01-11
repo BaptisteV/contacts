@@ -3,6 +3,8 @@ const app = express();
 const fs = require("fs");
 const path = require("path");
 
+const sanitize = require("./sanitize.js")
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -21,7 +23,7 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/contacts", async (req, res) => {
-  let queryResults = []
+  let queryResults = [];
   try {
     queryResults = await pgClient.query(
       'SELECT "firstName", "lastName", "price" FROM contacts ORDER BY "price" DESC'
@@ -32,29 +34,11 @@ app.get("/contacts", async (req, res) => {
   res.json(queryResults.rows);
 });
 
-function sanitizeNewContact(body) {
-  let price = body.price;
-  if (isNaN(parseFloat(price))) {
-    console.error("Invalid price: ", price);
-    price = 0;
-  } else {
-    price = parseFloat(price);
-  }
-
-  let firstName = body.firstName;
-  if (firstName.length === 0) firstName = null;
-
-  let lastName = body.lastName;
-  if (lastName.length === 0) lastName = null;
-
-  return { firstName: firstName, lastName: lastName, price: price };
-}
-
 app.post("/contact", async (req, res) => {
   const insertContactSQL =
     'INSERT INTO contacts("firstName", "lastName", "price") VALUES($1, $2, $3)';
 
-  const newContact = sanitizeNewContact(req.body);
+  const newContact = sanitize.sanitizeNewContact(req.body);
   try {
     await pgClient.query(insertContactSQL, [
       newContact.firstName,
@@ -89,7 +73,7 @@ app.put("/contact", async (req, res) => {
   const updateContactSQL =
     'UPDATE contacts SET "price" = $1 WHERE "firstName" = $2 AND "lastName" = $3';
 
-  const newContact = sanitizeNewContact(req.body);
+  const newContact = sanitize.sanitizeNewContact(req.body);
   try {
     await pgClient.query(updateContactSQL, [
       newContact.price,
