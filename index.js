@@ -52,22 +52,27 @@ app.get("/contacts", async (req, res) => {
   res.json(contacts);
 });
 
+function sanitizeNewContact(body) {
+  let price = body.price;
+  if (isNaN(parseFloat(price))) {
+    console.log("Invalid price: ", price);
+    price = 0;
+  } else {
+    price = parseFloat(price);
+  }
+
+  let firstName = body.firstName;
+  if (firstName.length === 0) firstName = null;
+
+  let lastName = body.lastName;
+  if (lastName.length === 0) lastName = null;
+
+  return { firstName: firstName, lastName: lastName, price: price };
+}
+
 app.post("/contact", async (req, res) => {
   const insertContactSQL =
     'INSERT INTO contacts("firstName", "lastName", "price") VALUES($1, $2, $3)';
-
-  function sanitizeNewContact(body) {
-    let price = req.body.price;
-    if (isNaN(price)) price = 0;
-
-    let firstName = body.firstName;
-    if (firstName.length === 0) firstName = null;
-
-    let lastName = body.lastName;
-    if (lastName.length === 0) lastName = null;
-
-    return { firstName: firstName, lastName: lastName, price: price };
-  }
 
   const newContact = sanitizeNewContact(req.body);
   try {
@@ -91,6 +96,25 @@ app.delete("/contact", async (req, res) => {
     await pgClient.query(deleteContactSQL, [
       req.body.firstName,
       req.body.lastName
+    ]);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+    return;
+  }
+  res.sendStatus(200);
+});
+
+app.put("/contact", async (req, res) => {
+  const updateContactSQL =
+    'UPDATE contacts SET "price" = $1 WHERE "firstName" = $2 AND "lastName" = $3';
+
+  const newContact = sanitizeNewContact(req.body);
+  try {
+    await pgClient.query(updateContactSQL, [
+      newContact.price,
+      newContact.firstName,
+      newContact.lastName
     ]);
   } catch (err) {
     console.log(err);
