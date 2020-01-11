@@ -16,46 +16,26 @@ const pgClient = new Client({
 });
 pgClient.connect();
 
-class Contact {
-  constructor(firstName, lastName, price) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.price = price;
-  }
-  format() {
-    return this.firstName + " " + this.lastName;
-  }
-}
-
 app.get("/", async (req, res) => {
   res.send(fs.readFileSync(`public/index.html`));
 });
 
 app.get("/contacts", async (req, res) => {
-  const contacts = [];
+  let queryResults = []
   try {
-    const queryResults = await pgClient.query(
+    queryResults = await pgClient.query(
       'SELECT "firstName", "lastName", "price" FROM contacts ORDER BY "price" DESC'
     );
-    queryResults.rows.forEach(queryResult => {
-      contacts.push(
-        new Contact(
-          queryResult.firstName,
-          queryResult.lastName,
-          queryResult.price
-        )
-      );
-    });
   } catch (err) {
     console.log(err);
   }
-  res.json(contacts);
+  res.json(queryResults.rows);
 });
 
 function sanitizeNewContact(body) {
   let price = body.price;
   if (isNaN(parseFloat(price))) {
-    console.log("Invalid price: ", price);
+    console.error("Invalid price: ", price);
     price = 0;
   } else {
     price = parseFloat(price);
