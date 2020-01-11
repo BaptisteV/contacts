@@ -43,6 +43,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.contacts
     OWNER to postgres;
+
+ALTER TABLE public.contacts
+    ADD COLUMN price money DEFAULT 0;
 ~~~
 
 ### Run 

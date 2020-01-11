@@ -2,14 +2,15 @@ const button = document.getElementById("newContact");
 button.addEventListener("click", async _ => {
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
+  const initialPrice = document.getElementById("initialPrice").value;
   try {
-    await fetch("/contacts", {
+    await fetch("/contact", {
       method: "post",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ firstName: firstName, lastName: lastName })
+      body: JSON.stringify({ firstName: firstName, lastName: lastName, price: initialPrice })
     });
     document.location.reload(true);
   } catch (err) {
@@ -38,15 +39,22 @@ function createDeleteButton(li, contact) {
   li.appendChild(button);
 }
 
+function createPriceInput(li, contact){
+  const priceInput = document.createElement("input");
+  priceInput.value = contact.price;
+  li.appendChild(priceInput);
+}
+
 function populateContactList(contacts) {
   const contactList = document.getElementById("contactList");
   contacts.forEach(contact => {
     const li = document.createElement("li");
-    li.appendChild(
-      document.createTextNode(contact.firstName + " " + contact.lastName + " ")
-    );
     createDeleteButton(li, contact);
+    li.appendChild(
+      document.createTextNode(" " + contact.firstName + " " + contact.lastName + " ")
+    );
     contactList.appendChild(li);
+    createPriceInput(li, contact);
   });
 }
 
